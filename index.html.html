@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Транспортни разходи · Витрини</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12181f;
+  --ink-2:#5a6673;
+  --ink-3:#8a97a4;
+  --line:#dfe4e9;
+  --line-2:#eef1f4;
+  --paper:#ffffff;
+  --canvas:#f5f7f9;
+  --deep:#0f5f66;
+  --deep-soft:#e3f0f0;
+  --flag:#a8560d;
+  --flag-soft:#fbeee0;
+  --pos:#1c6b3f;
+  --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--canvas);
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.5;
+  font-variant-numeric:tabular-nums;
+}
+.num{font-variant-numeric:tabular-nums lining-nums}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:264px minmax(0,1fr);min-height:100vh}
+.rail{
+  background:var(--paper);border-right:1px solid var(--line);
+  padding:20px 18px 40px;display:flex;flex-direction:column;gap:22px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.main{padding:24px 28px 64px;min-width:0}
+
+/* ---------- brand ---------- */
+.brand{display:flex;align-items:baseline;gap:8px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.brand b{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.brand span{font-size:11px;color:var(--ink-3)}
+
+/* ---------- filters ---------- */
+.fgroup{display:flex;flex-direction:column;gap:6px}
+.fgroup>label{font-size:12px;font-weight:500;color:var(--ink-2)}
+select,input[type=date]{
+  width:100%;font:inherit;font-size:13px;color:var(--ink);
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:7px 9px;
+}
+select:focus,input:focus{outline:2px solid var(--deep);outline-offset:-1px}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{
+  font:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  background:var(--paper);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);padding:8px 12px;
+}
+.btn:hover{border-color:var(--ink-3)}
+.btn-main{background:var(--deep);color:#fff;border-color:var(--deep)}
+.btn-main:hover{background:#0c4d53}
+.btn:focus-visible{outline:2px solid var(--deep);outline-offset:2px}
+
+/* ---------- drop zone ---------- */
+.drop{
+  border:1.5px dashed var(--line);border-radius:var(--radius);
+  padding:16px 12px;text-align:center;cursor:pointer;background:var(--canvas);
+}
+.drop:hover,.drop.over{border-color:var(--deep);background:var(--deep-soft)}
+.drop p{font-size:12px;color:var(--ink-2);line-height:1.45}
+.drop b{display:block;font-size:13px;color:var(--ink);margin-bottom:3px;font-weight:500}
+.loaded{font-size:11px;color:var(--ink-3);line-height:1.6;word-break:break-word}
+.loaded div{padding:2px 0;border-bottom:1px solid var(--line-2)}
+
+/* ---------- headline ---------- */
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+.head h1{font-size:19px;font-weight:600;letter-spacing:-.015em}
+.head p{font-size:13px;color:var(--ink-2);margin-top:2px}
+
+/* ---------- hero total ---------- */
+.hero{
+  background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:20px 22px;margin-bottom:16px;
+  display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+}
+.hero-fig{font-size:32px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.hero-fig s{text-decoration:none;font-size:16px;color:var(--ink-2);font-weight:500;margin-left:4px}
+.hero-lab{font-size:11px;color:var(--ink-2);margin-top:4px}
+.split{display:flex;gap:26px;flex-wrap:wrap;justify-content:flex-end}
+.split div{text-align:right}
+.split b{display:block;font-size:17px;font-weight:600}
+.split span{font-size:11px;color:var(--ink-3)}
+
+/* ---------- section ---------- */
+.sec{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin-bottom:16px;overflow:hidden}
+.sec-h{
+  padding:13px 18px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.sec-h h2{font-size:13px;font-weight:600}
+.sec-h .tot{font-size:13px;font-weight:600}
+.sec-h .sub{font-size:11px;color:var(--ink-3);font-weight:400}
+.sec-b{padding:16px 18px}
+.pad0{padding:0}
+
+/* ---------- table ---------- */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line-2);white-space:nowrap}
+th{
+  font-size:10px;font-weight:500;color:var(--ink-2);
+  background:var(--canvas);position:sticky;top:0;
+}
+td.r,th.r{text-align:center}
+tbody tr:hover{background:var(--canvas)}
+tfoot td{font-weight:600;border-top:1px solid var(--line);border-bottom:none;background:var(--canvas)}
+.scroll{max-height:380px;overflow-y:auto}
+
+/* ---------- bar rows ---------- */
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:100px 1fr 60px;gap:8px;align-items:center;font-size:11px}
+.bar .lb{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .tr{background:var(--line-2);border-radius:3px;height:8px;overflow:hidden}
+.bar .fl{height:100%;background:var(--deep);border-radius:3px}
+.bar .vl{text-align:right;font-weight:500}
+
+/* ---------- share table ---------- */
+.sh td.lvl1{padding-left:20px;color:var(--ink-2)}
+.sh tr.grp td{font-weight:600;background:var(--canvas)}
+.mini{display:inline-block;width:60px;height:5px;background:var(--line-2);border-radius:2px;vertical-align:middle;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--deep);border-radius:2px}
+.mini.f i{background:var(--flag)}
+.pct{font-weight:500;min-width:40px;display:inline-block;text-align:right}
+
+/* ---------- tag ---------- */
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:3px;background:var(--canvas);color:var(--ink-2)}
+.tag-f{background:var(--flag-soft);color:var(--flag)}
+.tag-d{background:var(--deep-soft);color:var(--deep)}
+
+/* ---------- notes ---------- */
+.note{
+  background:var(--flag-soft);border:1px solid #f0dcc2;border-radius:var(--radius);
+  padding:11px 14px;font-size:12.5px;color:#6b3c0a;line-height:1.55;margin-bottom:16px;
+}
+.empty{padding:34px 18px;text-align:center;color:var(--ink-3);font-size:13px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
+  .main{padding:18px 14px 48px}
+  .hero{grid-template-columns:1fr;gap:16px}
+  .split{justify-content:flex-start}
+  .split div{text-align:left}
+}
+@media (max-width:480px){
+  body{font-size:12px}
+  .shell{grid-template-columns:1fr}
+  .rail{width:100%;height:auto;position:static;padding:12px;border-bottom:1px solid var(--line);border-right:none;border-radius:0}
+  .main{padding:12px}
+  table{font-size:10px}
+  th,td{padding:4px 6px}
+  th{font-size:9px}
+  .bar{grid-template-columns:80px 1fr 50px;gap:6px;font-size:10px}
+  .sec-h h2{font-size:12px}
+  .hero-fig{font-size:28px}
+  .head h1{font-size:16px}
+  .btn{padding:9px 12px;font-size:11px}
+}
+@media print{.rail{display:none}.shell{grid-template-columns:1fr}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="rail">
+    <div class="brand"><b>Транспортни разходи</b><span>витрини</span></div>
+
+    <div class="fgroup">
+      <label for="f-comp">Фирма</label>
+      <select id="f-comp"><option value="">Всички фирми</option></select>
+    </div>
+
+    <div class="fgroup">
+      <label for="f-region">Регион</label>
+      <select id="f-region"><option value="">Всички региони</option></select>
+    </div>
+
+    <div class="fgroup">
+      <label for="f-pero">Перо</label>
+      <select id="f-pero">
+        <option value="">Всички пера</option>
+        <option value="movements">Движение на активи</option>
+        <option value="routes">Маршрути и километри</option>
+        <option value="loading">Товарене и разтоварване</option>
+        <option value="zones">Зонов модел</option>
+        <option value="other">Други разходи</option>
+      </select>
+    </div>
+
+    <div class="fgroup">
+      <label for="f-asset">Модел витрина</label>
+      <select id="f-asset"><option value="">Всички модели</option></select>
+    </div>
+
+    <div class="fgroup">
+      <label for="f-move">Тип движение</label>
+      <select id="f-move"><option value="">Всички движения</option></select>
+    </div>
+
+    <div class="fgroup">
+      <label for="f-mkt">Тип пазар</label>
+      <select id="f-mkt"><option value="">Всички пазари</option></select>
+    </div>
+
+    <div class="fgroup">
+      <label>Период</label>
+      <div class="dates">
+        <input type="date" id="f-from" aria-label="От дата">
+        <input type="date" id="f-to" aria-label="До дата">
+      </div>
+    </div>
+
+    <button class="btn" id="reset">Изчисти филтрите</button>
+
+    <div class="fgroup">
+      <label>Данни</label>
+      <div class="drop" id="drop" role="button" tabindex="0">
+        <p><b>Пусни Excel файловете тук</b>или натисни, за да ги избереш</p>
+      </div>
+      <input type="file" id="file" multiple accept=".xlsx,.xlsm" hidden>
+      <div class="loaded" id="loaded"></div>
+    </div>
+
+    <button class="btn" id="export">Свали текущия изглед (CSV)</button>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div>
+        <h1 id="title">Всички фирми</h1>
+        <p id="subtitle">—</p>
+      </div>
+      <button class="btn btn-main" id="pptx">Експорт PDF</button>
+      <input type="file" id="file-input" accept=".xlsx" multiple hidden />
+    </div>
+
+    <div id="notes"></div>
+
+    <div class="hero">
+      <div>
+        <div class="hero-fig num" id="grand">0,00<s>€</s></div>
+        <div class="hero-lab">Общо разходи без ДДС по текущите филтри</div>
+        <div class="split" id="split" style="margin-top:15px"></div>
+      </div>
+    </div>
+
+    <div id="board"></div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="app.js"></script>
+<script>
+const SEED={"regions":["SOF","CSB","SEB","NEB","SWB","NBG"],"companies":["CSB ЛИОН 2003","NBG БАД 99","NBG ВИП 2008 ПЛЕВЕН ЛОВЕЧ ГАБРОВО","NBG ИВ ТРАНС ВЕЛИКОТЪРНОВО","NBG МАКС ГАЛАНТ","NEB ИМ ТРАНС 75","SEB ЕМ ДИ 1004 ЕООД","SEB МАКС ГАЛАНТ","SOF БУС РЕНТ","SWB АТИ СТРОЙ ИНВЕСТ"],"skipped":["БАД 99"],"movements":[{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM MV","m":"Инсталиране","k":"HOD","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM DEVIN","m":"Инсталиране","k":"LKK/NKA","q":2.0,"p":11.86,"v":23.72},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM DEVIN","m":"Деинсталиране","k":"LKK/NKA","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM DEVIN","m":"Деинсталиране","k":"HOD","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_700","m":"Инсталиране","k":"LKK/NKA","q":1.0,"p":20.94,"v":20.94},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_900","m":"Инсталиране","k":"OFF","q":3.0,"p":23.03,"v":69.09},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_ KL COOL 1100","m":"Инсталиране","k":"OFF","q":1.0,"p":23.03,"v":23.03},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_374","m":"Деинсталиране","k":"OFF","q":1.0,"p":18.04,"v":18.04},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"RB SLIM","m":"Инсталиране","k":"OFF","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"RB SLIM","m":"Деинсталиране","k":"OFF","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM MV","m":"Инсталиране","k":"ONP","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM DEVIN","m":"Инсталиране","k":"LKK/NKA","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"SLIM DEVIN","m":"Деинсталиране","k":"OFF","q":1.0,"p":11.86,"v":11.86},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"RB SLIM","m":"Инсталиране","k":"LKK/NKA","q":2.0,"p":11.86,"v":23.72},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_374","m":"Инсталиране","k":"ONP","q":3.0,"p":18.04,"v":54.12},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_420","m":"Инсталиране","k":"LKK/NKA","q":2.0,"p":18.04,"v":36.08},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_700","m":"Инсталиране","k":"LKK/NKA","q":4.0,"p":20.94,"v":83.76},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_770","m":"Инсталиране","k":"ONP","q":2.0,"p":20.94,"v":41.88},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_900","m":"Инсталиране","k":"OFF","q":1.0,"p":23.03,"v":23.03},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"TYPE_900","m":"Деинсталиране","k":"OFF","q":1.0,"p":23.03,"v":23.03},{"c":"SOF БУС РЕНТ","d":"2026-09-01","a":"СТЕЛАЖ ДЕВИН","m":"Деинсталиране","k":"OFF","q":2.0,"p":11.86,"v":23.72}],"routes":[],"loading":[{"c":"SOF БУС РЕНТ","d":"2026-09-01","t":"ТОВАРЕНЕ","p":16.11,"q":2.0,"v":32.22},{"c":"SOF БУС РЕНТ","d":"2026-09-01","t":"РАЗТОВАРВАНЕ","p":16.11,"q":1.0,"v":16.11},{"c":"SOF БУС РЕНТ","d":"2026-09-01","t":"ТОВАРЕНЕ","p":16.11,"q":2.0,"v":32.22},{"c":"SOF БУС РЕНТ","d":"2026-09-01","t":"РАЗТОВАРВАНЕ","p":16.11,"q":1.0,"v":16.11}],"other":[],"zones":[{"c":"SEB МАКС ГАЛАНТ","d":"","z":"","vit":0.0,"cha":1.0,"dv":0.0,"dc":0.0,"v":0.0},{"c":"NBG МАКС ГАЛАНТ","d":"","z":"","vit":0.0,"cha":5.0,"dv":0.0,"dc":0.0,"v":0.0},{"c":"NBG МАКС ГАЛАНТ","d":"","z":"","vit":0.0,"cha":1.0,"dv":0.0,"dc":0.0,"v":0.0}]};
+</script>
+<script>
+const money = n => (Math.round(n * 100) / 100).toLocaleString('bg-BG',
+  { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
+const qty = n => (Math.round(n * 100) / 100).toLocaleString('bg-BG',
+  { maximumFractionDigits: 2 });
+const esc = s => (String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
+const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
+const group = (arr, keyFn, valFn, qtyFn) => {
+  const m = {};
+  arr.forEach(x => {
+    const k = keyFn(x), v = valFn(x), q = qtyFn ? qtyFn(x) : 1;
+    if (!m[k]) m[k] = { k, v: 0, q: 0 };
+    m[k].v += v;
+    m[k].q += q;
+  });
+  return Object.values(m).sort((a, b) => b.v - a.v);
+};
+const regionOf = c => {
+  const r = String(c).split(' ')[0];
+  return ['SOF','CSB','SEB','NEB','SWB','NBG'].includes(r) ? r : '—';
+};
+const NO_REGION = '—';
+
+let DB = { movements: [], routes: [], loading: [], other: [], zones: [], companies: [], skipped: [] };
+let FILES = [];
+
+function readFiles(files) {
+  if (!files || !files.length) return;
+  let pending = { count: files.length };
+  const fresh = { movements: [], routes: [], loading: [], other: [], zones: [], companies: [], skipped: [] };
+  const names = [];
+  const skipped_files = [];
+
+  const fileList = Array.from(files);
+  fileList.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result));
+        const comp = file.name.split('.')[0];
+        const r = String(comp).split('_')[0];
+        
+        if (!['SOF','CSB','SEB','NEB','SWB','NBG'].includes(r)) {
+          skipped_files.push(comp);
+          if (--pending.count === 0) finish();
+          return;
+        }
+
+        names.push({ comp, n: 0 });
+        const parseSheet = (sheetName, parser) => {
+          if (sheetName in wb.SheetNames) {
+            const ws = wb.Sheets[sheetName];
+            const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+            parser(data, comp);
+          }
+        };
+
+        const findHeader = (rows, col) => rows.findIndex(r => r && String(r[0] || '').toUpperCase().includes(col));
+        const colOf = (row, label) => row.findIndex(c => String(c || '').toUpperCase().includes(label));
+        const num = v => {
+          const n = Number(v);
+          return isNaN(n) ? 0 : n;
+        };
+        const dstr = d => {
+          if (!d) return '';
+          const dt = new Date(d);
+          return isNaN(dt) ? String(d) : dt.toISOString().split('T')[0];
+        };
+
+        parseSheet('Движение на Активи', (rows, comp) => {
+          const hi = 0;  // Header is at row 0
+          if (hi >= rows.length) return;
+          
+          const h = rows[hi];
+          const cD = 0;  // Дата
+          const cA = 1;  // ТИП АКТИВ
+          
+          // Find movement blocks by looking for "РАЗХОД" pattern
+          // Инсталиране (cols 2-8), Деинсталиране (cols 9-15), Преместване (cols 16-22), Неизпълнено (cols 23-29)
+          const movementMap = {
+            'Инсталиране': 8,      // РАЗХОД column for Инсталиране
+            'Деинсталиране': 15,   // РАЗХОД column for Деинсталиране
+            'Преместване': 22,     // РАЗХОД column for Преместване
+            'Неизпълнено': 29      // РАЗХОД column for Неизпълнено
+          };
+          
+          for (let r = 1; r < rows.length; r++) {
+            const row = rows[r];
+            if (!row || !row[cD]) continue;
+            
+            const date = dstr(row[cD]);
+            const asset = String(row[cA] || '').trim();
+            
+            // Process each movement type
+            Object.entries(movementMap).forEach(([movement, razhodCol]) => {
+              const v = num(row[razhodCol]);
+              if (v > 0) {
+                // Extract quantity by looking at the columns before РАЗХОД
+                // Columns pattern: БРОЙ_OFF, БРОЙ_ONP, БРОЙ_LKK, БРОЙ_HOD, БРОЙ_СОБЫТИЯ, ЕД.ЦЕНА, РАЗХОД
+                const colStart = razhodCol - 7;
+                let totalQty = 0;
+                let market = '';
+                
+                // Find which market has the quantity
+                for (let i = colStart; i < razhodCol - 2; i++) {
+                  const q = num(row[i]);
+                  if (q > 0) {
+                    totalQty = q;
+                    const headerText = String(h[i] || '').toUpperCase();
+                    if (headerText.includes('OFF')) market = 'OFF';
+                    else if (headerText.includes('ONP')) market = 'ONP';
+                    else if (headerText.includes('LKK') || headerText.includes('NKA')) market = 'LKK/NKA';
+                    else if (headerText.includes('HOD')) market = 'HOD';
+                    else if (headerText.includes('СЪБИТ')) market = 'СЪБИТИЯ';
+                    break;
+                  }
+                }
+                
+                const price = num(row[razhodCol - 1]);
+                if (totalQty > 0 && price > 0) {
+                  fresh.movements.push({
+                    c: comp, d: date, a: asset,
+                    m: movement, k: market || 'ДРУГИ',
+                    q: totalQty, p: Math.round(price * 100) / 100, v: Math.round(v * 100) / 100
+                  });
+                  names[names.length - 1].n++;
+                }
+              }
+            });
+          }
+        });
+
+        parseSheet('Описание на маршрута', (rows, comp) => {
+          const hi = findHeader(rows, 'ДАТА');
+          if (hi < 0) return;
+          const h = rows[hi];
+          const cD = colOf(h, 'ДАТА'), cR = colOf(h, 'МАРШРУТ');
+          const cKm = colOf(h, 'КМ'), cP = colOf(h, 'ЦЕНА'), cV = colOf(h, 'РАЗХОД');
+          for (let r = hi + 1; r < rows.length; r++) {
+            const row = rows[r];
+            if (!row) continue;
+            const v = num(row[cV]);
+            if (v) {
+              fresh.routes.push({
+                c: comp, d: dstr(row[cD]), r: String(row[cR] || '').trim(),
+                km: Math.round(num(row[cKm]) * 100) / 100, p: Math.round(num(row[cP]) * 100) / 100,
+                v: Math.round(v * 100) / 100
+              });
+            }
+          }
+        });
+
+        parseSheet('Товарене', (rows, comp) => {
+          for (let r = 1; r < rows.length; r++) {
+            if (!rows[r] || rows[r].length < 5) continue;
+            const hdr = [...rows[r].slice(0, 5)].map(x => String(x || '').toUpperCase());
+            if (hdr[0].includes('ДАТА')) continue;
+            const t = String(rows[r][1] || '').trim();
+            const q = num(rows[r][3]), v = num(rows[r][4]);
+            if (t && v) {
+              fresh.loading.push({ c: comp, d: dstr(rows[r][0]), t, q, v: Math.round(v * 100) / 100 });
+            }
+          }
+        });
+
+        if (pending.count > 0) pending.count--;
+        if (pending.count === 0) finish();
+      } catch (err) {
+        console.error(file.name, err);
+        if (--pending.count === 0) finish();
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  function finish() {
+    fresh.companies = [...new Set(names.map(x => x.comp))];
+    fresh.skipped = skipped_files;
+    DB = fresh;
+    buildFilters();
+    render();
+    alert('Файловете са качени успешно!');
+  }
+}
+
+function buildFilters() {
+  const rSel = document.getElementById('f-region').value;
+  const roster = DB.companies && DB.companies.length ? DB.companies : [];
+  const withData = new Set([...DB.movements, ...DB.routes, ...DB.loading].map(r => r.c));
+  
+  // Always show all 6 regions
+  const allRegions = ['SOF', 'CSB', 'SEB', 'NEB', 'SWB', 'NBG'];
+  fillSelect('f-region', allRegions, rSel);
+  
+  // Populate companies filter - all companies from roster
+  const shown = rSel ? roster.filter(c => regionOf(c) === rSel) : roster;
+  const keepComp = shown.indexOf(document.getElementById('f-comp').value) >= 0 ? document.getElementById('f-comp').value : '';
+  if (!keepComp) document.getElementById('f-comp').value = '';
+  const sortedShown = shown.sort((a, b) => {
+    const regCmp = regionOf(a).localeCompare(regionOf(b), 'bg');
+    return regCmp !== 0 ? regCmp : a.localeCompare(b, 'bg');
+  });
+  fillSelect('f-comp', sortedShown, keepComp, c => (withData.has(c) ? c : c + '  (без данни)'));
+  
+  // Populate asset models from all movements
+  const assets = [...new Set(DB.movements.map(r => r.a).filter(a => a))].sort();
+  fillSelect('f-asset', assets, document.getElementById('f-asset').value);
+  
+  // Populate movement types from all movements
+  const moves = [...new Set(DB.movements.map(r => r.m).filter(m => m))].sort();
+  fillSelect('f-move', moves, document.getElementById('f-move').value);
+  
+  // Populate markets from all movements
+  const mkts = [...new Set(DB.movements.map(r => r.k).filter(k => k))].sort();
+  fillSelect('f-mkt', mkts, document.getElementById('f-mkt').value);
+}
+
+function fillSelect(id, options, selected, label) {
+  const sel = document.getElementById(id);
+  const labels = {
+    'f-comp': 'фирми',
+    'f-region': 'региони',
+    'f-asset': 'модели',
+    'f-move': 'движения',
+    'f-mkt': 'пазари'
+  };
+  sel.innerHTML = '<option value="">Всички ' + (labels[id] || id) + '</option>';
+  if (options && options.length) {
+    options.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o;
+      opt.textContent = (label ? label(o) : o);
+      if (o === selected) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+const apply = () => {
+  const f = {
+    region: document.getElementById('f-region').value,
+    comp: document.getElementById('f-comp').value,
+    pero: document.getElementById('f-pero').value,
+    from: document.getElementById('f-from').value,
+    to: document.getElementById('f-to').value
+  };
+  const movements = DB.movements.filter(r => (!f.region || regionOf(r.c) === f.region) && (!f.comp || r.c === f.comp) && (!f.pero || f.pero === 'movements'));
+  const routes = (DB.routes || []).filter(r => (!f.region || regionOf(r.c) === f.region) && (!f.comp || r.c === f.comp) && (!f.pero || f.pero === 'routes'));
+  const loading = (DB.loading || []).filter(r => (!f.region || regionOf(r.c) === f.region) && (!f.comp || r.c === f.comp) && (!f.pero || f.pero === 'loading'));
+  const zones = (DB.zones || []).filter(r => (!f.region || regionOf(r.c) === f.region) && (!f.comp || r.c === f.comp) && (!f.pero || f.pero === 'zones'));
+  const other = (DB.other || []).filter(r => (!f.region || regionOf(r.c) === f.region) && (!f.comp || r.c === f.comp) && (!f.pero || f.pero === 'other'));
+  const grand = sum(movements, r => r.v) + sum(routes, r => r.v) + sum(loading, r => r.v) + sum(zones, r => r.v) + sum(other, r => r.v);
+  return { movements, routes, loading, zones, other, f, grand };
+};
+
+function render() {
+  const D = apply();
+  const board = [];
+  const grand = D.grand || 0;
+  
+  // Calculate sums once
+  const movSum = sum(D.movements, r => r.v);
+  const loadSum = sum(D.loading, r => r.v);
+  const routeSum = sum(D.routes, r => r.v);
+  const zoneSum = sum(D.zones, r => r.v);
+  const otherSum = sum(D.other, r => r.v);
+
+  // Update main hero display
+  document.getElementById('grand').innerHTML = money(grand).replace('€', '') + '<s>€</s>';
+  
+  // Build breakdown grid for split display - show all types in 2 columns
+  let splitHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:10px;font-size:13px">';
+  splitHtml += '<div style="display:flex;justify-content:space-between"><span>Движение на активи</span><span style="font-weight:500">' + money(movSum) + '</span></div>';
+  splitHtml += '<div style="display:flex;justify-content:space-between"><span>Товарене и разтоварване</span><span style="font-weight:500">' + money(loadSum) + '</span></div>';
+  splitHtml += '<div style="display:flex;justify-content:space-between"><span>Маршрути и километри</span><span style="font-weight:500">' + money(routeSum) + '</span></div>';
+  splitHtml += '<div style="display:flex;justify-content:space-between"><span>Зонов модел</span><span style="font-weight:500">' + money(zoneSum) + '</span></div>';
+  splitHtml += '<div style="display:flex;justify-content:space-between"><span>Други разходи</span><span style="font-weight:500">' + money(otherSum) + '</span></div>';
+  splitHtml += '</div>';
+  document.getElementById('split').innerHTML = splitHtml;
+  
+  // Keep subtitle empty
+  document.getElementById('subtitle').innerHTML = '—';
+
+  // Section 1: Expense by company
+  board.push('<div class="sec"><div class="sec-h"><h2>Разход по фирма · ' + D.movements.length + ' редове</h2></div>');
+  if (!D.f.comp) {
+    const g = group(D.movements, r => r.c, r => r.v, r => r.q);
+    if (g.length) {
+      board.push('<table class="sh"><tbody>');
+      g.forEach(x => {
+        board.push('<tr><td>' + esc(x.k) + '</td><td class="r">' + qty(x.q) + '</td><td class="r">' + money(x.v) + '</td></tr>');
+      });
+      board.push('<tfoot><tr><td>Общо</td><td class="r">' + qty(sum(D.movements, r => r.q)) + '</td><td class="r">' + money(sum(D.movements, r => r.v)) + '</td></tr></tfoot></tbody></table>');
+    }
+  }
+  board.push('</div>');
+
+  // Section 2: Cost structure by type - show all types
+  board.push('<div class="sec"><div class="sec-h"><h2>Структура на разходите</h2></div>');
+  board.push('<table class="sh"><thead><tr><th>Тип разход</th><th>Брой редове</th><th>Сума €</th></tr></thead><tbody>');
+  
+  // Always show all types, even if 0
+  board.push('<tr><td>Движение на активи</td><td class="r">' + D.movements.length + '</td><td class="r">' + money(movSum) + '</td></tr>');
+  board.push('<tr><td>Товарене и разтоварване</td><td class="r">' + D.loading.length + '</td><td class="r">' + money(loadSum) + '</td></tr>');
+  board.push('<tr><td>Маршрути и километри</td><td class="r">' + D.routes.length + '</td><td class="r">' + money(routeSum) + '</td></tr>');
+  board.push('<tr><td>Зонов модел</td><td class="r">' + D.zones.length + '</td><td class="r">' + money(zoneSum) + '</td></tr>');
+  board.push('<tr><td>Други разходи</td><td class="r">' + D.other.length + '</td><td class="r">' + money(otherSum) + '</td></tr>');
+  
+  // Count total rows from all types
+  const totalDisplayRows = D.movements.length + D.loading.length + D.routes.length + D.zones.length + D.other.length;
+  board.push('<tfoot><tr><td><strong>ОБЩО</strong></td><td class="r"><strong>' + totalDisplayRows + '</strong></td><td class="r"><strong>' + money(grand) + '</strong></td></tr></tfoot></tbody></table>');
+  board.push('</div>');
+
+  // Section 3: Company × Months table
+  board.push('<div class="sec"><div class="sec-h"><h2>Разход по фирма и месец</h2></div>');
+  const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Юни', 'Юли', 'Авг', 'Сеп', 'Окт', 'Ное', 'Дек'];
+  
+  // Build company × month matrix for ALL companies with ALL expense types
+  const companyMonthData = {};
+  const allCompanies = DB.companies || [];
+  
+  // Initialize all companies
+  allCompanies.forEach(comp => {
+    companyMonthData[comp] = { months: {}, totalValue: 0, totalQty: 0 };
+  });
+  
+  // Helper function to add expense data (for value/cost)
+  const addExpenseValue = (records) => {
+    records.forEach(r => {
+      if (companyMonthData[r.c]) {
+        const month = new Date(r.d + 'T00:00:00').getMonth();
+        if (!companyMonthData[r.c].months[month]) {
+          companyMonthData[r.c].months[month] = 0;
+        }
+        companyMonthData[r.c].months[month] += r.v;
+        companyMonthData[r.c].totalValue += r.v;  // ONLY add value, not quantity
+      }
+    });
+  };
+  
+  // Fill in values from ALL expense types
+  addExpenseValue(D.movements);
+  addExpenseValue(D.loading);
+  addExpenseValue(D.routes);
+  addExpenseValue(D.zones);
+  addExpenseValue(D.other);
+  
+  // Fill in quantity ONLY from movements
+  D.movements.forEach(r => {
+    if (companyMonthData[r.c]) {
+      companyMonthData[r.c].totalQty += r.q;  // ONLY movements for quantity
+    }
+  });
+  
+  // Build scrollable table
+  board.push('<div style="overflow-x:auto;border:1px solid #ddd;border-radius:4px;margin:10px 0"><table style="min-width:100%;border-collapse:collapse;font-size:8px;white-space:nowrap"><thead style="background:#f5f5f5"><tr><th style="padding:2px;text-align:left;border-right:1px solid #ddd;min-width:90px;font-size:7px">Фирма</th>');
+  for (let m = 0; m < 12; m++) {
+    board.push('<th style="padding:4px;text-align:right;border-right;font-size:8px:1px solid #ddd;min-width:60px">' + months[m] + '</th>');
+  }
+  board.push('<th style="padding:4px;text-align:right;border-right;font-size:8px:1px solid #ddd;min-width:80px">Брой активи</th><th style="padding:4px;text-align:right;border-right;font-size:8px:1px solid #ddd;min-width:140px">Общ разход от всички пера</th><th style="padding:8px;text-align:right;min-width:70px">Осреднена цена на единица актив</th></tr></thead><tbody>');
+  
+  let rowCount = 0;
+  allCompanies.sort().forEach(comp => {
+    const data = companyMonthData[comp];
+    const bgColor = rowCount % 2 === 0 ? 'white' : '#fafafa';
+    board.push('<tr style="background:' + bgColor + '"><td style="padding:4px;border-right:1px solid #ddd;font-weight:500;font-size:9px">' + esc(comp) + '</td>');
+    for (let m = 0; m < 12; m++) {
+      const val = data.months[m] || 0;
+      board.push('<td style="padding:4px;text-align:right;border-right;font-size:8px:1px solid #ddd;font-size:11px">' + (val > 0 ? money(val) : '—') + '</td>');
+    }
+    const avgValue = data.totalQty > 0 ? Math.round(data.totalValue / data.totalQty * 100) / 100 : 0;
+    board.push('<td style="padding:4px;text-align:right;border-right;font-size:8px:1px solid #ddd">' + qty(data.totalQty) + '</td>');
+    board.push('<td style="padding:4px;text-align:right;border-right;font-size:8px:1px solid #ddd;font-weight:600">' + money(data.totalValue) + '</td>');
+    board.push('<td style="padding:8px;text-align:right">' + money(avgValue) + '</td></tr>');
+    rowCount++;
+  });
+  
+  board.push('</tbody></table></div>');
+  board.push('</div>');
+
+  // Section 3b: Region × Months table
+  board.push('<div class="sec"><div class="sec-h"><h2>Разход по регион и месец</h2></div>');
+  const months2 = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Юни', 'Юли', 'Авг', 'Сеп', 'Окт', 'Ное', 'Дек'];
+  
+  // Build region × month matrix
+  const regionMonthData = {};
+  const allRegions = ['SOF', 'CSB', 'SEB', 'NEB', 'SWB', 'NBG'];
+  
+  // Initialize all regions
+  allRegions.forEach(reg => {
+    regionMonthData[reg] = { months: {}, totalValue: 0, totalQty: 0, companies: [] };
+  });
+  
+  // Helper to add expense data by region
+  const addExpenseByRegion = (records) => {
+    records.forEach(r => {
+      const reg = regionOf(r.c);
+      if (regionMonthData[reg]) {
+        const month = new Date(r.d + 'T00:00:00').getMonth();
+        if (!regionMonthData[reg].months[month]) {
+          regionMonthData[reg].months[month] = 0;
+        }
+        regionMonthData[reg].months[month] += r.v;
+        regionMonthData[reg].totalValue += r.v;
+      }
+    });
+  };
+  
+  // Add values from all expense types
+  addExpenseByRegion(D.movements);
+  addExpenseByRegion(D.loading);
+  addExpenseByRegion(D.routes);
+  addExpenseByRegion(D.zones);
+  addExpenseByRegion(D.other);
+  
+  // Add quantity ONLY from movements
+  D.movements.forEach(r => {
+    const reg = regionOf(r.c);
+    if (regionMonthData[reg]) {
+      regionMonthData[reg].totalQty += r.q;
+    }
+  });
+  
+  // Build scrollable table for regions
+  board.push('<div style="overflow-x:auto;border:1px solid #ddd;border-radius:4px;margin:10px 0"><table style="min-width:100%;border-collapse:collapse;font-size:8px;white-space:nowrap"><thead style="background:#f5f5f5"><tr><th style="padding:5px;text-align:left;border-right:1px solid #ddd;min-width:80px">Регион</th>');
+  for (let m = 0; m < 12; m++) {
+    board.push('<th style="padding:8px;text-align:right;border-right:1px solid #ddd;min-width:60px">' + months2[m] + '</th>');
+  }
+  board.push('<th style="padding:8px;text-align:right;border-right:1px solid #ddd;min-width:80px">Брой активи</th><th style="padding:8px;text-align:right;border-right:1px solid #ddd;min-width:140px">Общ разход от всички пера</th><th style="padding:8px;text-align:right;min-width:70px">Осреднена цена на единица актив</th></tr></thead><tbody>');
+  
+  // Group companies by region
+  const companiesByRegion = {};
+  (DB.companies || []).forEach(comp => {
+    const reg = regionOf(comp);
+    if (!companiesByRegion[reg]) companiesByRegion[reg] = [];
+    companiesByRegion[reg].push(comp);
+  });
+  
+  // Prepare data for each company
+  const companyMonthDataForRegions = {};
+  allCompanies.forEach(comp => {
+    if (companyMonthDataForRegions[comp]) return; // already done
+    companyMonthDataForRegions[comp] = { months: {}, totalValue: 0, totalQty: 0 };
+  });
+  
+  // Fill company data
+  D.movements.forEach(r => {
+    if (!companyMonthDataForRegions[r.c]) companyMonthDataForRegions[r.c] = { months: {}, totalValue: 0, totalQty: 0 };
+    const m = new Date(r.d + 'T00:00:00').getMonth();
+    if (!companyMonthDataForRegions[r.c].months[m]) companyMonthDataForRegions[r.c].months[m] = 0;
+    companyMonthDataForRegions[r.c].months[m] += r.v;
+    companyMonthDataForRegions[r.c].totalValue += r.v;
+    companyMonthDataForRegions[r.c].totalQty += r.q;
+  });
+  
+  const allExpensesForComp = (comp) => {
+    let val = companyMonthDataForRegions[comp] ? companyMonthDataForRegions[comp].totalValue : 0;
+    // Add other expense types
+    D.loading.forEach(r => { if (r.c === comp) val += r.v; });
+    D.routes.forEach(r => { if (r.c === comp) val += r.v; });
+    D.zones.forEach(r => { if (r.c === comp) val += r.v; });
+    D.other.forEach(r => { if (r.c === comp) val += r.v; });
+    return val;
+  };
+  
+  let regRowCount = 0;
+  allRegions.forEach(reg => {
+    const data = regionMonthData[reg];
+    const bgColor = regRowCount % 2 === 0 ? 'white' : '#fafafa';
+    
+    // Main region row with expand/collapse button
+    const hasMultipleCompanies = (companiesByRegion[reg] || []).length > 1;
+    const buttonId = 'region-toggle-' + reg;
+    let regionButton = '';
+    if (hasMultipleCompanies) {
+      regionButton = '<span id="' + buttonId + '" style="cursor:pointer;font-weight:bold;margin-right:8px;user-select:none;display:inline-block;width:20px">+</span>';
+    }
+    board.push('<tr style="background:' + bgColor + '" id="region-row-' + reg + '"><td style="padding:8px;border-right:1px solid #ddd;font-weight:600">' + regionButton + reg + '</td>');
+    for (let m = 0; m < 12; m++) {
+      const val = data.months[m] || 0;
+      board.push('<td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-size:11px">' + (val > 0 ? money(val) : '—') + '</td>');
+    }
+    const avgValue = data.totalQty > 0 ? Math.round(data.totalValue / data.totalQty * 100) / 100 : 0;
+    board.push('<td style="padding:8px;text-align:right;border-right:1px solid #ddd">' + qty(data.totalQty) + '</td>');
+    board.push('<td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-weight:600">' + money(data.totalValue) + '</td>');
+    board.push('<td style="padding:8px;text-align:right">' + money(avgValue) + '</td></tr>');
+    
+    // Sub-rows for companies if more than 1 in region
+    const regComps = companiesByRegion[reg] || [];
+    if (regComps.length > 1) {
+      regComps.sort().forEach(comp => {
+        const compData = companyMonthDataForRegions[comp] || { months: {}, totalValue: 0, totalQty: 0 };
+        const compTotalValue = allExpensesForComp(comp);
+        const compAvg = compData.totalQty > 0 ? Math.round(compTotalValue / compData.totalQty * 100) / 100 : 0;
+        
+        board.push('<tr class="region-' + reg + '-companies" style="background:' + bgColor + ';opacity:0.85;display:none"><td style="padding:8px 8px 8px 25px;border-right:1px solid #ddd;font-size:11px;color:var(--ink-2)">→ ' + esc(comp) + '</td>');
+        for (let m = 0; m < 12; m++) {
+          const val = compData.months[m] || 0;
+          board.push('<td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-size:10px">' + (val > 0 ? money(val) : '—') + '</td>');
+        }
+        board.push('<td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-size:10px">' + qty(compData.totalQty) + '</td>');
+        board.push('<td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-size:10px">' + money(compTotalValue) + '</td>');
+        board.push('<td style="padding:8px;text-align:right;font-size:10px">' + money(compAvg) + '</td></tr>');
+      });
+    }
+    
+    regRowCount++;
+  });
+  
+  board.push('</tbody></table></div>');
+  board.push('</div>');
+
+  // Section 4: Expense by region
+  board.push('<div class="sec"><div class="sec-h"><h2>Разход по регион · ' + money(grand) + '</h2></div>');
+  board.push('<table class="sh"><thead><tr><th>Регион</th><th>Брой</th><th>Движения</th><th>Товарене</th><th>Маршрути</th><th>Други</th><th>Общо</th></tr></thead><tbody>');
+  const regions = [...new Set(D.movements.map(r => regionOf(r.c)))].sort();
+  regions.forEach(reg => {
+    const mov = sum(D.movements.filter(r => regionOf(r.c) === reg), r => r.v);
+    const loa = sum(D.loading.filter(r => regionOf(r.c) === reg), r => r.v);
+    const rou = sum(D.routes.filter(r => regionOf(r.c) === reg), r => r.v);
+    const oth = sum(D.other.filter(r => regionOf(r.c) === reg), r => r.v);
+    const tot = mov + loa + rou + oth;
+    const firms = D.movements.filter(r => regionOf(r.c) === reg).length;
+    board.push('<tr><td>' + reg + '</td><td class="r">' + firms + '</td><td class="r">' + money(mov) + '</td><td class="r">' + money(loa) + '</td><td class="r">' + money(rou) + '</td><td class="r">' + money(oth) + '</td><td class="r"><strong>' + money(tot) + '</strong></td></tr>');
+  });
+  board.push('<tfoot><tr><td colspan="6"><strong>ОБЩО</strong></td><td class="r"><strong>' + money(grand) + '</strong></td></tr></tfoot></tbody></table>');
+  board.push('</div>');
+
+  // Section 5: Movement × Market type
+  board.push('<div class="sec"><div class="sec-h"><h2>Движение × тип пазар</h2></div>');
+  const matrix = [];
+  const mkts = [...new Set(D.movements.map(r => r.k))];
+  mkts.forEach(k => {
+    const tot = sum(D.movements.filter(r => r.k === k), r => r.v);
+    matrix.push([k || '?', qty(D.movements.filter(r => r.k === k).length), money(tot)]);
+  });
+  if (matrix.length) {
+    board.push('<table class="sh"><thead><tr><th>Пазар</th><th>Брой</th><th>Разход</th></tr></thead><tbody>');
+    matrix.forEach(m => board.push('<tr><td>' + esc(m[0]) + '</td><td class="r">' + m[1] + '</td><td class="r">' + m[2] + '</td></tr>'));
+    board.push('<tfoot><tr><td>Общо</td><td class="r">' + qty(D.movements.length) + '</td><td class="r">' + money(sum(D.movements, r => r.v)) + '</td></tr></tfoot></tbody></table>');
+  }
+  board.push('</div>');
+
+  // Section 6: Loading operations
+  board.push('<div class="sec"><div class="sec-h"><h2>Товарене и разтоварване</h2></div>');
+  if (D.loading.length) {
+    const g = group(D.loading, r => r.t, r => r.v, r => r.q);
+    board.push('<table class="sh"><thead><tr><th>Операция</th><th>Брой</th><th>Разход</th></tr></thead><tbody>');
+    g.forEach(x => board.push('<tr><td>' + esc(x.k) + '</td><td class="r">' + qty(x.q) + '</td><td class="r">' + money(x.v) + '</td></tr>'));
+    board.push('<tfoot><tr><td>Общо</td><td class="r">' + qty(sum(D.loading, r => r.q)) + '</td><td class="r">' + money(sum(D.loading, r => r.v)) + '</td></tr></tfoot></tbody></table>');
+  }
+  board.push('</div>');
+
+  // Section 6b: Routes and kilometers
+  board.push('<div class="sec"><div class="sec-h"><h2>Маршрути и километри</h2></div>');
+  if (D.routes.length) {
+    const gRoutes = group(D.routes, r => r.r, r => r.v);
+    board.push('<table class="sh"><thead><tr><th>Маршрут</th><th>Брой</th><th>Разход</th></tr></thead><tbody>');
+    gRoutes.forEach(x => board.push('<tr><td>' + esc(x.k) + '</td><td class="r">' + x.q + '</td><td class="r">' + money(x.v) + '</td></tr>'));
+    board.push('<tfoot><tr><td>Общо</td><td class="r">' + D.routes.length + '</td><td class="r">' + money(sum(D.routes, r => r.v)) + '</td></tr></tfoot></tbody></table>');
+  } else {
+    board.push('<p style="color:var(--ink-2);font-size:13px;padding:15px">Няма записи. Попълнете данни в Excel файлове за маршрути и километри.</p>');
+  }
+  board.push('</div>');
+
+  // Section 6c: Zone model
+  board.push('<div class="sec"><div class="sec-h"><h2>Зонов модел</h2></div>');
+  if (D.zones.length) {
+    const gZones = group(D.zones, r => r.z, r => r.v);
+    board.push('<table class="sh"><thead><tr><th>Зона</th><th>Брой</th><th>Разход</th></tr></thead><tbody>');
+    gZones.forEach(x => board.push('<tr><td>' + esc(x.k) + '</td><td class="r">' + x.q + '</td><td class="r">' + money(x.v) + '</td></tr>'));
+    board.push('<tfoot><tr><td>Общо</td><td class="r">' + D.zones.length + '</td><td class="r">' + money(sum(D.zones, r => r.v)) + '</td></tr></tfoot></tbody></table>');
+  } else {
+    board.push('<p style="color:var(--ink-2);font-size:13px;padding:15px">Няма записи. Попълнете данни в Excel файлове за зонови модели.</p>');
+  }
+  board.push('</div>');
+
+  // Section 6d: Other expenses
+  board.push('<div class="sec"><div class="sec-h"><h2>Други разходи</h2></div>');
+  if (D.other.length) {
+    const gOther = group(D.other, r => r.t, r => r.v);
+    board.push('<table class="sh"><thead><tr><th>Тип разход</th><th>Брой</th><th>Разход</th></tr></thead><tbody>');
+    gOther.forEach(x => board.push('<tr><td>' + esc(x.k) + '</td><td class="r">' + x.q + '</td><td class="r">' + money(x.v) + '</td></tr>'));
+    board.push('<tfoot><tr><td>Общо</td><td class="r">' + D.other.length + '</td><td class="r">' + money(sum(D.other, r => r.v)) + '</td></tr></tfoot></tbody></table>');
+  } else {
+    board.push('<p style="color:var(--ink-2);font-size:13px;padding:15px">Няма записи. Попълнете данни в Excel файлове за други разходи.</p>');
+  }
+  board.push('</div>');
+
+  // Section 7: Detailed movements list
+  board.push('<div class="sec"><div class="sec-h"><h2>Списък движения</h2></div>');
+  if (D.movements.length) {
+    board.push('<div style="overflow-x:auto;border:1px solid #ddd;border-radius:4px;margin:10px 0"><table style="min-width:100%;border-collapse:collapse;font-size:7px"><thead style="background:#f5f5f5"><tr><th style="padding:8px;border-right:1px solid #ddd;min-width:60px">Дата</th><th style="padding:4px;border-right:1px solid #ddd;min-width:90px">Фирма</th><th style="padding:4px;border-right:1px solid #ddd;min-width:70px">Актив</th><th style="padding:8px;border-right:1px solid #ddd;min-width:70px">Движение</th><th style="padding:4px;border-right:1px solid #ddd;min-width:60px">Пазар</th><th style="padding:2px;text-align:center;border-right:1px solid #ddd;min-width:40px">Брой</th><th style="padding:2px;text-align:center;border-right:1px solid #ddd;min-width:50px">Цена</th><th style="padding:4px;text-align:right;min-width:50px">Разход</th></tr></thead><tbody>');
+    
+    const sortedMovements = [...D.movements].sort((a, b) => b.d.localeCompare(a.d));
+    let moveRowCount = 0;
+    sortedMovements.forEach(m => {
+      const bgColor = moveRowCount % 2 === 0 ? 'white' : '#fafafa';
+      board.push('<tr style="background:' + bgColor + '"><td style="padding:8px;border-right:1px solid #ddd;font-size:11px">' + m.d + '</td><td style="padding:8px;border-right:1px solid #ddd;font-weight:500">' + esc(m.c) + '</td><td style="padding:8px;border-right:1px solid #ddd;font-size:11px">' + esc(m.a || '—') + '</td><td style="padding:8px;border-right:1px solid #ddd;font-size:11px">' + esc(m.m || '—') + '</td><td style="padding:8px;border-right:1px solid #ddd;font-size:11px">' + esc(m.k || '—') + '</td><td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-size:11px">' + qty(m.q) + '</td><td style="padding:8px;text-align:right;border-right:1px solid #ddd;font-size:11px">' + money(m.p) + '</td><td style="padding:8px;text-align:right;font-weight:600">' + money(m.v) + '</td></tr>');
+      moveRowCount++;
+    });
+    
+    board.push('<tfoot style="background:#f9f9f9;font-weight:600"><tr><td colspan="5" style="padding:8px">ОБЩО (' + D.movements.length + ' движения)</td><td style="padding:8px;text-align:right;border-right:1px solid #ddd">' + qty(sum(D.movements, r => r.q)) + '</td><td style="padding:8px;text-align:right;border-right:1px solid #ddd">—</td><td style="padding:8px;text-align:right">' + money(sum(D.movements, r => r.v)) + '</td></tr></tfoot></tbody></table></div>');
+  }
+  board.push('</div>');
+
+  document.getElementById('board').innerHTML = board.join('');
+  console.log('[render] completed with ' + board.length + ' sections');
+  
+  // Add expand/collapse functionality for regions
+  setTimeout(() => {
+    document.querySelectorAll('[id^="region-toggle-"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const regName = btn.id.replace('region-toggle-', '');
+        const rows = document.querySelectorAll('.region-' + regName + '-companies');
+        const isHidden = rows[0] && rows[0].style.display === 'none';
+        
+        rows.forEach(row => {
+          row.style.display = isHidden ? 'table-row' : 'none';
+        });
+        
+        btn.textContent = isHidden ? '−' : '+';
+      });
+    });
+  }, 50);
+  
+  // Update loaded files display
+  if (FILES.length) {
+    let html = '<div style="margin-top:15px;"><h4 style="margin:8px 0;color:var(--ink);font-size:13px">Качени файлове:</h4>';
+    html += '<ul style="margin:0;padding:0;list-style:none;font-size:12px">';
+    FILES.forEach(f => {
+      const hasData = f.n > 0;
+      const rowText = f.n === 0 ? 'без данни' : f.n + ' редове';
+      const textColor = hasData ? 'var(--deep)' : 'var(--ink-3)';
+      html += '<li style="padding:5px 0;border-bottom:1px solid var(--line)">' + 
+              '<span style="color:' + textColor + ';font-weight:500">' + f.comp + '</span>' +
+              ' — <span style="color:var(--ink-2)">' + rowText + '</span></li>';
+    });
+    html += '</ul>';
+    html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line);color:var(--ink-2);font-size:12px">';
+    const totalRows = FILES.reduce((s, f) => s + f.n, 0);
+    html += '<strong>Общо:</strong> ' + FILES.length + ' файла, ' + totalRows + ' редове';
+    html += '</div></div>';
+    document.getElementById('loaded').innerHTML = html;
+  } else {
+    document.getElementById('loaded').innerHTML = '';
+  }
+}
+
+function exportPDF() {
+  try {
+    const D = apply();
+    const grand = D.grand || 0;
+    
+    // Create HTML report
+    let html = `<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Анализ на Транспортни Разходи</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #333; }
+    @media print { body { margin: 0; padding: 10mm; } }
+    .container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+    h1 { font-size: 24px; color: #0f5f66; margin: 20px 0 5px 0; text-align: center; }
+    .subtitle { text-align: center; color: #999; font-size: 10px; margin-bottom: 20px; }
+    .grand-box { background: #f0f5f5; border: 2px solid #0f5f66; padding: 15px; margin: 20px 0; text-align: center; }
+    .grand-box .value { font-size: 18px; color: #0f5f66; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    table th { background: #0f5f66; color: white; padding: 8px; text-align: left; font-weight: bold; border: 1px solid #0f5f66; }
+    table td { padding: 8px; border: 1px solid #ddd; }
+    table tr:nth-child(even) { background: #f9f9f9; }
+    table tr.total { background: #f0f5f5; font-weight: bold; }
+    table td.number { text-align: right; }
+    .section-title { font-size: 12px; font-weight: bold; color: #0f5f66; margin: 15px 0 10px 0; }
+    .spacer { height: 30px; }
+    @media print { .spacer { page-break-after: always; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Анализ на Транспортни Разходи</h1>
+    <div class="subtitle">Дата: ${new Date().toLocaleDateString('bg-BG')}</div>
+    
+    <div class="grand-box">
+      <div>Общо разход:</div>
+      <div class="value">${money(grand)}</div>
+    </div>
+    
+    <div class="section-title">ПРЕГЛЕД НА РАЗХОДИТЕ</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Тип разход</th>
+          <th class="number">Брой</th>
+          <th class="number">Разход €</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Движение на активи</td>
+          <td class="number">${D.movements.length}</td>
+          <td class="number">${money(sum(D.movements, r => r.v))}</td>
+        </tr>
+        <tr>
+          <td>Товарене и разтоварване</td>
+          <td class="number">${D.loading.length}</td>
+          <td class="number">${money(sum(D.loading, r => r.v))}</td>
+        </tr>
+        <tr>
+          <td>Маршрути и километри</td>
+          <td class="number">${D.routes.length}</td>
+          <td class="number">${money(sum(D.routes, r => r.v))}</td>
+        </tr>
+        <tr>
+          <td>Зонов модел</td>
+          <td class="number">${D.zones.length}</td>
+          <td class="number">${money(sum(D.zones, r => r.v))}</td>
+        </tr>
+        <tr>
+          <td>Други разходи</td>
+          <td class="number">${D.other.length}</td>
+          <td class="number">${money(sum(D.other, r => r.v))}</td>
+        </tr>
+        <tr class="total">
+          <td>ОБЩО</td>
+          <td class="number"></td>
+          <td class="number">${money(grand)}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="section-title">РАЗХОД ПО РЕГИОН</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Регион</th>
+          <th class="number">Разход €</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${[...new Set(D.movements.map(r => regionOf(r.c)))].sort().map(reg => {
+          const total = sum(D.movements.filter(r => regionOf(r.c) === reg), r => r.v) + 
+                        sum(D.loading.filter(r => regionOf(r.c) === reg), r => r.v) +
+                        sum(D.routes.filter(r => regionOf(r.c) === reg), r => r.v) +
+                        sum(D.zones.filter(r => regionOf(r.c) === reg), r => r.v);
+          return '<tr><td>' + reg + '</td><td class="number">' + money(total) + '</td></tr>';
+        }).join('')}
+        <tr class="total">
+          <td>ОБЩО</td>
+          <td class="number">${money(grand)}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="spacer"></div>
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 10px; color: #999;">
+      <p>За експорт като PDF: Натисни Ctrl+P (или Cmd+P) и избери "Запазване като PDF"</p>
+    </div>
+  </div>
+</body>
+</html>`;
+    
+    // Create blob and download
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Transportni_Razhodi_' + new Date().toISOString().slice(0, 10) + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('HTML файлът е скачан!\nОтвори го и натисни Ctrl+P за да го експортираш като PDF');
+    
+  } catch (err) {
+    console.error('Експорт грешка:', err);
+    alert('Грешка при експорт: ' + err.message);
+  }
+}
+
+function exportDetailsExcel() {
+  const D = apply();
+  const allRows = [
+    ...D.movements.map(r => ({ d: r.d, c: r.c, a: r.a, m: r.m, k: r.k, q: r.q, p: r.p, v: r.v, type: 'движение' })),
+    ...D.routes.map(r => ({ d: r.d, c: r.c, r: r.r, km: r.km, p: r.p, v: r.v, type: 'маршрут' })),
+    ...D.loading.map(r => ({ d: r.d, c: r.c, t: r.t, q: r.q, v: r.v, type: 'товарене' })),
+    ...D.zones.map(r => ({ d: r.d, c: r.c, z: r.z, vit: r.vit, cha: r.cha, v: r.v, type: 'зона' })),
+    ...D.other.map(r => ({ d: r.d, c: r.c, t: r.t, v: r.v, type: 'други' }))
+  ].sort((a, b) => a.d.localeCompare(b.d));
+
+  const rows = [['Дата', 'Фирма', 'Тип', 'Детайли', 'Брой', 'Разход €']];
+  allRows.forEach(r => {
+    let details = '';
+    switch(r.type) {
+      case 'движение': details = [r.a || '—', r.m || '—', r.k || '—'].join(' · '); break;
+      case 'маршрут': details = (r.r || '—') + ' (' + r.km + ' км)'; break;
+      case 'товарене': details = r.t + (r.q ? ' (' + r.q + ')' : ''); break;
+      case 'зона': details = r.z + ' (' + (r.vit || 0) + '/' + (r.cha || 0) + ')'; break;
+      case 'други': details = r.t || '—'; break;
+    }
+    rows.push([r.d, r.c, r.type, details, r.q || '', r.v]);
+  });
+
+  const grand = allRows.reduce((s, x) => s + x.v, 0);
+  rows.push(['Общо', '', '', '', '', grand]);
+
+  try {
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch: 12}, {wch: 25}, {wch: 12}, {wch: 30}, {wch: 10}, {wch: 12}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Детайли');
+    const fileName = 'Детайли_разход_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    XLSX.writeFile(wb, fileName);
+  } catch(e) {
+    alert('Грешка при експорт: ' + e.message);
+    console.error(e);
+  }
+}
+
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+fileInput.addEventListener('change', e => readFiles(e.target.files));
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.add('over');
+}));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.remove('over');
+}));
+drop.addEventListener('drop', e => {
+  if (e.dataTransfer && e.dataTransfer.files) readFiles(e.dataTransfer.files);
+});
+
+['f-region', 'f-comp', 'f-pero', 'f-asset', 'f-move', 'f-mkt', 'f-from', 'f-to'].forEach(id => {
+  if (document.getElementById(id)) {
+    document.getElementById(id).addEventListener('change', () => {
+      if (id === 'f-region') buildFilters();
+      render();
+    });
+  }
+});
+
+document.getElementById('export').addEventListener('click', () => {
+  const D = apply();
+  const rows = [
+    ['Дата', 'Фирма', 'Движение', 'Пазар', 'Брой', 'Цена', 'Разход']
+  ];
+  D.movements.forEach(r => {
+    rows.push([r.d, r.c, r.m, r.k, r.q, r.p, r.v]);
+  });
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv; charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'Движения_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+});
+
+document.getElementById('pptx').addEventListener('click', exportPDF);
+
+/* seed */
+if (typeof SEED !== 'undefined') {
+  DB = SEED;
+  DB.skipped = SEED.skipped || [];
+  // Build FILES from all companies in the seed
+  const allData = [...DB.movements, ...DB.routes, ...DB.loading, ...DB.other, ...DB.zones];
+  FILES = (SEED.companies || []).sort((a, b) => a.localeCompare(b, 'bg')).map(c => ({
+    comp: c,
+    n: allData.filter(x => x.c === c).length
+  }));
+}
+// Ensure DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    buildFilters();
+    render();
+  });
+} else {
+  buildFilters();
+  render();
+}
+
+</script>
+</body>
+</html>
